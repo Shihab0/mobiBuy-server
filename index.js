@@ -29,12 +29,24 @@ mongodbConnect();
 
 ////////////////// MONGODB COLLECTION ///////////////////////
 const categoryCollection = client.db("mobiBuy").collection("categories");
+const productsCollection = client.db("mobiBuy").collection("products");
 
 //////////////////// LOAD CATEGORIES /////////////////////////////
 app.get("/categories", async (req, res) => {
   const query = {};
   const categories = await categoryCollection.find(query).toArray();
   res.send(categories);
+});
+
+///////////////////// DISPLAY PRODUCTS ////////////////////////////
+app.get("/products/:id", async (req, res) => {
+  const id = req.params.id;
+  console.log(id);
+  const query = {
+    category_id: id,
+  };
+  const products = await productsCollection.find(query).toArray();
+  res.send(products);
 });
 
 //////////////////////////////////////////////////////////////////
