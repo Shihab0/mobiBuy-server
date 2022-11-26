@@ -64,6 +64,15 @@ app.post("/addProduct", async (req, res) => {
   res.send(result);
 });
 
+///////////////////// GET / DELETE / UPDATE  SELLER PRODUCTS ///////////////
+app.get("/dashboard/myProducts", async (req, res) => {
+  const email = req.query.email;
+  console.log(email);
+  const query = { email: email };
+  const products = await productsCollection.find(query).toArray();
+  res.send(products);
+});
+
 //////////////////////////////////////////////////////////////////
 /// END  ///
 //////////////////////////////////////////////////////////////////
