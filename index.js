@@ -40,6 +40,13 @@ app.post("/users", async (req, res) => {
   res.send(result);
 });
 
+app.get("/seller", async (req, res) => {
+  const email = req.query.email;
+  const query = { email: email };
+  const result = await usersCollection.find(query).toArray();
+  res.send(result);
+});
+
 //////////////////// LOAD CATEGORIES /////////////////////////////
 app.get("/categories", async (req, res) => {
   const query = {};
@@ -110,6 +117,19 @@ app.put("/users/makeAdmin/:id", async (req, res) => {
   const updateDoc = {
     $set: {
       role: "admin",
+    },
+  };
+  const result = await usersCollection.updateOne(filter, updateDoc, options);
+  res.send(result);
+});
+
+app.put("/seller/makeVerify/:id", async (req, res) => {
+  const id = req.params.id;
+  const filter = { _id: ObjectId(id) };
+  const options = { upsert: true };
+  const updateDoc = {
+    $set: {
+      verified: "true",
     },
   };
   const result = await usersCollection.updateOne(filter, updateDoc, options);
