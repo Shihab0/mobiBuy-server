@@ -1,5 +1,5 @@
 const express = require("express");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cors = require("cors");
 require("dotenv").config();
 const port = process.env.PORT || 5000;
@@ -52,16 +52,40 @@ app.get("/products/:id", async (req, res) => {
   const query = {
     category_id: id,
   };
-  const products = await productsCollection.find(query).toArray();
+  const products = await (
+    await productsCollection.find(query).toArray()
+  ).reverse();
   res.send(products);
 });
 
-//////////////////////// ADD PRODUCT ////////////////////////////////
+//////////////////////// ADD PRODUCT & GET////////////////////////////////
 app.post("/addProduct", async (req, res) => {
   const product = req.body;
   const result = await productsCollection.insertOne(product);
-  console.log(product);
   res.send(result);
+});
+
+app.put("/boost/:id", async (req, res) => {
+  const id = req.params.id;
+  const filter = { _id: ObjectId(id) };
+  const options = { upsert: true };
+  const updateDoc = {
+    $set: {
+      advertised: true,
+    },
+  };
+  const result = await productsCollection.updateOne(filter, updateDoc, options);
+  console.log(result);
+  res.send(result);
+});
+
+app.get("/advertised/", async (req, res) => {
+  const advertised = Boolean(req.query.advertised);
+  const query = { advertised: advertised };
+  const advertisedProducts = (
+    await productsCollection.find(query).toArray()
+  ).reverse();
+  res.send(advertisedProducts);
 });
 
 ////////////////////   USER INFORMATION UPDATE / GET / DELETE ///////////////
@@ -72,10 +96,28 @@ app.get("/dashboard", async (req, res) => {
   res.send(loadedUser);
 });
 
+app.get("/dashboard/users", async (req, res) => {
+  const query = {};
+  const users = await (await usersCollection.find(query).toArray()).reverse();
+  res.send(users);
+});
+
+app.put("/users/makeAdmin/:id", async (req, res) => {
+  const id = req.params.id;
+  const filter = { _id: ObjectId(id) };
+  const options = { upsert: true };
+  const updateDoc = {
+    $set: {
+      role: "admin",
+    },
+  };
+  const result = await usersCollection.updateOne(filter, updateDoc, options);
+  res.send(result);
+});
+
 ///////////////////// GET / DELETE / UPDATE  SELLER PRODUCTS ///////////////
 app.get("/dashboard/myProducts", async (req, res) => {
   const email = req.query.email;
-  console.log(email);
   const query = { email: email };
   const products = await productsCollection.find(query).toArray();
   res.send(products);
