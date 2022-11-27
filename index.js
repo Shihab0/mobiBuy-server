@@ -136,6 +136,14 @@ app.put("/seller/makeVerify/:id", async (req, res) => {
   res.send(result);
 });
 
+app.delete("/user/delete/:id", async (req, res) => {
+  const id = req.params.id;
+  const query = { _id: ObjectId(id) };
+  const result = await usersCollection.deleteOne(query);
+  res.send(result);
+  console.log(result);
+});
+
 ///////////////////// GET / DELETE / UPDATE  SELLER PRODUCTS ///////////////
 app.get("/dashboard/myProducts", async (req, res) => {
   const email = req.query.email;
