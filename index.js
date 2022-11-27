@@ -31,6 +31,7 @@ mongodbConnect();
 const categoryCollection = client.db("mobiBuy").collection("categories");
 const productsCollection = client.db("mobiBuy").collection("products");
 const usersCollection = client.db("mobiBuy").collection("users");
+const bookingsCollection = client.db("mobiBuy").collection("bookings");
 
 /////////////////////// USER OPERATION /////////////////////////
 app.post("/users", async (req, res) => {
@@ -121,6 +122,13 @@ app.get("/dashboard/myProducts", async (req, res) => {
   const query = { email: email };
   const products = await productsCollection.find(query).toArray();
   res.send(products);
+});
+
+////////////////  BOOKING PRODUCT MANAGE ////////////////
+app.post("/booking", async (req, res) => {
+  const bookingProduct = req.body;
+  const result = await bookingsCollection.insertOne(bookingProduct);
+  res.send(result);
 });
 
 //////////////////////////////////////////////////////////////////
