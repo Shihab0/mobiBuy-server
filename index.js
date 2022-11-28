@@ -1,6 +1,7 @@
 const express = require("express");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cors = require("cors");
+const { query } = require("express");
 require("dotenv").config();
 const port = process.env.PORT || 5000;
 
@@ -83,7 +84,6 @@ app.put("/boost/:id", async (req, res) => {
     },
   };
   const result = await productsCollection.updateOne(filter, updateDoc, options);
-  console.log(result);
   res.send(result);
 });
 
@@ -96,6 +96,31 @@ app.get("/advertised/", async (req, res) => {
   res.send(advertisedProducts);
 });
 
+app.get("/dashboard/reported", async (req, res) => {
+  const query = { reported: "reported" };
+  const reportedProduct = await productsCollection.find(query).toArray();
+  res.send(reportedProduct);
+});
+
+app.put("/makeReport/:id", async (req, res) => {
+  const id = req.params.id;
+  const filter = { _id: ObjectId(id) };
+  const options = { upsert: true };
+  const updateDoc = {
+    $set: {
+      reported: "reported",
+    },
+  };
+  const result = await productsCollection.updateOne(filter, updateDoc, options);
+  res.send(result);
+});
+
+app.get("/myOrders", async (req, res) => {
+  const email = req.query.email;
+  const query = { email: email };
+  const myOrders = (await bookingsCollection.find(query).toArray()).reverse();
+  res.send(myOrders);
+});
 ////////////////////   USER INFORMATION UPDATE / GET / DELETE ///////////////
 app.get("/dashboard", async (req, res) => {
   const email = req.query.email;
