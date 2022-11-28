@@ -175,6 +175,13 @@ app.delete("/product/deleteReported/:id", async (req, res) => {
   res.send(result);
 });
 
+app.delete("/myProduct/delete/:id", async (req, res) => {
+  const id = req.params.id;
+  const query = { _id: ObjectId(id) };
+  const result = await productsCollection.deleteOne(query);
+  res.send(result);
+});
+
 ///////////////////// GET / DELETE / UPDATE  SELLER PRODUCTS ///////////////
 app.get("/dashboard/myProducts", async (req, res) => {
   const email = req.query.email;
